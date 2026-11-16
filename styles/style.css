@@ -54,9 +54,6 @@ ol {
 }
 
 .content {
-  /*width: 1140px;*/
-  /*height: 564px;*/
-  /*padding: 133px 30px;*/
   display: grid;
   grid-template-areas: "result details";
   align-items: end;
@@ -83,7 +80,7 @@ ol {
 .search-form {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
@@ -92,7 +89,6 @@ ol {
   block-size: 298px;
   overflow: auto;
   padding: 2px;
-  gap: 30px;
 }
 
 .result__video-container {
@@ -101,13 +97,11 @@ ol {
   position: relative;
 }
 
-
 .result__video {
   height: 100%;
   width: 100%;
   object-fit: cover;
   object-position: center;
-  cursor: pointer;
 }
 
 .content__list {
@@ -123,25 +117,25 @@ ol {
 
 .content__video-card {
   display: flex;
-  flex-direction:row;
+  flex-direction: row;
   color: #fff;
-  background-color: transparent;
+  align-items: flex-start;
 }
 
 .content__card-link {
   display: block;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
 
 .content__card-link:active {
   background-color: #545050;
 }
 
-
 .content__video-card-thumbnail {
   /* видео для видеокарточки */
-  object-fit:cover;
+  object-fit: cover;
   object-position: center;
   width: 194px;
   height: 103px;
@@ -181,7 +175,6 @@ ol {
   flex-grow: 1;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
 }
 
 .content__card-link_current {
@@ -200,7 +193,6 @@ ol {
 .content__card-link:focus-visible {
   outline: 1px solid #fff;
   outline-offset: -1px;
-  background-color: transparent;
 }
 
 .content__accent {
@@ -213,7 +205,6 @@ ol {
   font-size: 75px;
   line-height: 94%;
   text-transform: uppercase;
-  margin: 0 0 26px;
 }
 
 .visually-hidden {
@@ -282,7 +273,6 @@ ol {
   align-items: center;
   width: fit-content;
   gap: 5px;
-  background-color: transparent;
   cursor: pointer;
 }
 
@@ -293,11 +283,6 @@ ol {
 
 .search-form__label:hover .search-form__label-text {
   text-decoration: underline;
-}
-
-.search-form__label:has(.search-form__textfield:focus-visible) {
-  border: none;
-  outline: 1px solid #fff;
 }
 
 .search-form__textfield {
@@ -316,10 +301,14 @@ ol {
   width: 225px;
 }
 
+.search-form__textfield::placeholder {
+  color: rgb(255 255 255 / 0.7);
+}
+
 .search-form__checkbox-list {
   /* чекбоксы в линию */
   display: flex;
-  gap:15px;
+  gap: 15px;
   justify-content: center;
 }
 
