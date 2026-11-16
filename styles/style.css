@@ -8,6 +8,14 @@ html {
   block-size: 100%;
 }
 
+/* .page — это <body class="page">, корневой видимый контейнер страницы.
+   inline-size: 1200px — фиксированная ширина макета (не адаптивная, по заданию).
+   block-size: 100% — на всю высоту экрана (наследует от html).
+   margin: auto — центрирует блок по горизонтали, когда его ширина меньше родителя.
+   color/font-family/font-size — базовые настройки текста, наследуются потомками.
+   background-color — тёмный фон страницы из макета.
+   display: flex + justify-content/align-items: center — центрируют .content
+   и по горизонтали, и по вертикали внутри .page. */
 .page {
   inline-size: 1200px;
   block-size: 100%;
@@ -34,25 +42,29 @@ fieldset {
   margin: 0;
   padding: 0;
 }
-
 ul,
 ol {
   list-style: none;
 }
-
-/* Кастомный скроллбар */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: rgb(217 217 217 / 10%);
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #D9D9D9;
 }
 
+/* ============================================================
+   3. ЛЕЙАУТ: .content — две колонки
+   ============================================================ */
+
+/* .content — грид-контейнер на две колонки.
+   grid-template-areas: "result details" — задаёт имена зон: слева result, справа details.
+   grid-template-columns: 711px 399px — фиксированные ширины колонок по макету.
+   align-items: end — прижимает содержимое ячеек к низу (колонки выравниваются по нижнему краю).
+   gap: 30px — отступ между колонками.*/
 .content {
   display: grid;
   grid-template-areas: "result details";
@@ -61,6 +73,12 @@ ol {
   gap: 30px;
 }
 
+/* ============================================================
+   4. ЛЕВАЯ КОЛОНКА: видео + форма
+   ============================================================ */
+
+/* .result — зона грида. Внутри — флекс-колонка:
+   видео сверху, форма снизу, отступ между ними 16px. */
 .result {
   grid-area: result;
   display: flex;
@@ -68,6 +86,34 @@ ol {
   gap: 16px;
 }
 
+/* Контейнер видео — фиксированный размер по макету.
+   position: relative нужен, чтобы абсолютно позиционированный прелоадер
+   (который JS вставляет во время загрузки) встал ПОВЕРХ видео,
+   а не поверх всей страницы. */
+.result__video-container {
+  width: 711px;
+  height: 386px;
+  position: relative;
+}
+
+/* Видео занимает 100% ширины и высоты контейнера.
+   object-fit: cover — видео масштабируется так, чтобы заполнить контейнер,
+   лишнее обрезается, пропорции сохраняются (без искажений).
+   object-position: center — обрезка идёт от центра.*/
+.result__video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ============================================================
+   5. ПРАВАЯ КОЛОНКА: заголовок + список карточек
+   ============================================================ */
+
+/* .content__details — зона details. Флекс-колонка: заголовок сверху, список снизу.
+   gap: 26px — отступ между заголовком и зоной карточек.
+   inline-size/block-size: 100% — растягивается на всю ячейку грида. */
 .content__details {
   display: flex;
   flex-direction: column;
@@ -77,13 +123,30 @@ ol {
   grid-area: details;
 }
 
-.search-form {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
+/* Заголовок «Посмотри в окно» — крупный, жирный, капсом.
+   line-height: 94% — намеренно меньше 100%, чтобы строки стояли плотно,
+   как в макете*/
+.title {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 75px;
+  line-height: 94%;
+  text-transform: uppercase;
 }
 
+.content__accent {
+  color: #545050;
+}
+
+/* ============================================================
+   6. СПИСОК КАРТОЧЕК: контейнер и список
+   ============================================================ */
+
+/* Контейнер списка.
+   block-size: 298px — фиксированная высота, чтобы список не растягивался.
+   overflow: auto — если карточек больше, чем влезает, появляется прокрутка.
+   position: relative — для прелоадера поверх списка (как у видео).
+   padding: 2px — небольшой запас, чтобы обводка фокуса карточек не прилипала к краю. */
 .content__list-container {
   position: relative;
   block-size: 298px;
@@ -91,37 +154,32 @@ ol {
   padding: 2px;
 }
 
-.result__video-container {
-  width: 711px;
-  height: 386px;
-  position: relative;
-}
-
-.result__video {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
+/* Сам список — флекс-колонка карточек.
+   gap: 22px — отступ между карточками*/
 .content__list {
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
+/* Один пункт списка.
+   padding по бокам 3px — место под обводку фокуса, чтобы она не прилипала
+   к границе карточки. */
 .content__list-item {
   padding-left: 3px;
   padding-right: 3px;
 }
 
-.content__video-card {
-  display: flex;
-  flex-direction: row;
-  color: #fff;
-  align-items: flex-start;
-}
+/* ============================================================
+   7. КАРТОЧКА ВИДЕО
+   ============================================================ */
 
+/* Ссылка-обёртка карточки.
+   display: block — ссылка по умолчанию строчная (inline), фон у неё
+   отображался бы только под текстом. Блочная — фон на всю карточку.
+   text-decoration: none — убираем дефолтное подчёркивание ссылки.
+   color: inherit — наследуем белый цвет от родителя.
+   cursor: pointer — рука при наведении (карточка кликабельна). */
 .content__card-link {
   display: block;
   text-decoration: none;
@@ -129,20 +187,66 @@ ol {
   cursor: pointer;
 }
 
+/* Активное состояние (в момент нажатия мыши) — серый фон. */
 .content__card-link:active {
   background-color: #545050;
 }
 
-.content__video-card-thumbnail {
-  /* видео для видеокарточки */
-  object-fit: cover;
-  object-position: center;
-  width: 194px;
-  height: 103px;
+/* Текущая (выбранная) карточка — серый фон.
+   Этот класс добавляет JavaScript той карточке, на которую кликнули. */
+.content__card-link_current {
+  background-color: #545050;
 }
 
+/* При наведении подчёркиваем ТЕКСТ карточки (заголовок и описание).
+   Подчёркиваем именно текст, а не всю карточку — так в макете. */
+.content__card-link:hover .content__video-card-title,
+.content__card-link:hover .content__video-card-description {
+  text-decoration: underline;
+}
+
+/* :focus — сброс стандартной обводки браузера.
+   Без этого при клике мышью вокруг карточки появлялась бы синяя рамка. */
+.content__card-link:focus {
+  outline: none;
+}
+
+/*
+   outline-offset: -1px — обводка рисуется ВНУТРИ карточки,
+   чтобы не увеличивать её размер и не сдвигать соседей. */
+.content__card-link:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: -1px;
+}
+
+/* Сама карточка — флекс-строка: слева текст, справа картинка.
+   align-items: flex-start — прижимает содержимое к верху (по макету),
+   а не растягивает по высоте  */
+.content__video-card {
+  display: flex;
+  flex-direction: row;
+  color: #fff;
+  align-items: flex-start;
+}
+
+/* Контейнер текста в карточке.
+   flex-grow: 1 — занимает всё свободное место, которое не заняла картинка.
+   Без этого текст и картинка делили бы ширину по содержимому.
+   flex-direction: column — заголовок над описанием.
+   gap: 6px — отступ между заголовком и описанием. */
+.content__video-card-description-container {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Заголовок карточки с обрезкой длинного текста «…».
+   Три свойства работают ТОЛЬКО вместе:
+     overflow: hidden — обрезает всё, что не влезло;
+     white-space: nowrap — запрещает перенос на новую строку (одна строка);
+     text-overflow: ellipsis — вместо обрезки рисует «…».*/
 .content__video-card-title {
-  /* подзаголовок видеокарточки с ... */
   font-family: 'Fira Sans Condensed', sans-serif;
   font-size: 30px;
   line-height: 40px;
@@ -155,8 +259,14 @@ ol {
   width: 196px;
 }
 
+/* Описание карточки с обрезкой после 3 строк.
+   line-clamp — приём для многострочной обрезки:
+     display: -webkit-box — особый режим отображения, нужный для line-clamp;
+     -webkit-box-orient: vertical — направление блока вертикальное;
+     -webkit-line-clamp: 3 — максимум 3 строки, дальше «…»;
+     overflow: hidden — скрывает всё, что за пределами 3 строк.
+   line-height: 16.2px — намеренно меньше шрифта (18px), как в макете. */
 .content__video-card-description {
-  /* описание видеокарточки с ... */
   font-family: 'Fira Sans Condensed', sans-serif;
   font-weight: 400;
   font-size: 18px;
@@ -169,44 +279,28 @@ ol {
   text-overflow: ellipsis;
 }
 
-.content__video-card-description-container {
-  /* левая часть видеокарточки с текстом */
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  gap: 6px;
+/* Картинка карточки — фиксированный размер.
+   object-fit: cover — заполняет область без искажений, обрезая лишнее.
+   object-position: center — обрезка от центра. */
+.content__video-card-thumbnail {
+  object-fit: cover;
+  object-position: center;
+  width: 194px;
+  height: 103px;
 }
 
-.content__card-link_current {
-  background-color: #545050;
-}
+/* ============================================================
+   8. УТИЛИТЫ
+   ============================================================ */
 
-.content__card-link:hover .content__video-card-title,
-.content__card-link:hover .content__video-card-description {
-  text-decoration: underline;
-}
-
-.content__card-link:focus {
-  outline: none;
-}
-
-.content__card-link:focus-visible {
-  outline: 1px solid #fff;
-  outline-offset: -1px;
-}
-
-.content__accent {
-  color: #545050;
-}
-
-.title {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 75px;
-  line-height: 94%;
-  text-transform: uppercase;
-}
-
+/* .visually-hidden — скрывает элемент ВИЗУАЛЬНО, но оставляет его
+   в документе для программ чтения с экрана (скринридеров).
+   Как работает:
+     position: absolute — вынимает из потока;
+     inline-size/block-size: 1px — делает крошечным;
+     overflow: hidden — прячет содержимое;
+     clip / clip-path — обрезает до нуля (старый и новый способ);
+     white-space: nowrap — не даёт тексту переноситься.*/
 .visually-hidden {
   position: absolute;
   inline-size: 1px;
@@ -217,6 +311,15 @@ ol {
   white-space: nowrap;
 }
 
+/* ============================================================
+   9. КНОПКИ
+   ============================================================ */
+
+/* Общие стили всех кнопок
+   border: 1px solid currentColor — рамка цветом текущего текста (белая).
+     currentColor удобен: меняешь color — рамка меняется автоматически.
+   background-color: transparent — прозрачный фон.
+   cursor: pointer — рука при наведении. */
 .button {
   border: 1px solid currentColor;
   color: #fff;
@@ -226,67 +329,85 @@ ol {
   cursor: pointer;
 }
 
+/* Наведение — подчёркивание текста. */
 .button:hover {
   text-decoration: underline;
 }
 
+/* Нажатие — серый фон. */
 .button:active {
   background-color: #545050;
 }
 
+/* Сброс стандартной обводки при фокусе (чтобы не было синей рамки от браузера). */
 .button:focus {
   outline: none;
 }
 
+/* Обводка при фокусе с клавиатуры (Tab), снаружи, с отступом 2px. */
 .button:focus-visible {
   outline: 1px solid white;
   outline-offset: 2px;
 }
 
+/* Кнопка «Найти»: фиксированная ширина.
+   align-self: flex-end — прижимает к низу флекс-контейнера формы
+   (в форме align-items: flex-start, а эта кнопка — исключение, вниз). */
 .search-form__submit-button {
   width: 194px;
   align-self: flex-end;
 }
 
+/* Кнопка «Показать ещё»: на всю ширину контейнера.
+   margin-top: 30px — отступ от последней карточки списка. */
 .more-button {
   width: 100%;
   margin-top: 30px;
 }
 
+/* ============================================================
+   10. ФОРМА ПОИСКА
+   ============================================================ */
+
+/* Форма — флекс-строка: две группы полей и кнопка.
+   align-items: flex-start — прижимает элементы к верху (по макету).
+   justify-content: space-between — распределяет элементы по ширине:
+   первая группа слева, вторая по центру, кнопка справа. */
+.search-form {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Группа полей — флекс-колонка: заголовок над полем/чекбоксами.
+   border: none — сбрасываем дефолтную рамку fieldset.
+   gap: 7px — отступ между заголовком и полем. */
 .search-form__fieldset {
-  /* сброс рамки */
   border: none;
   display: flex;
   flex-direction: column;
   gap: 7px;
 }
 
+/* Заголовок группы «Город» / «Время суток».
+   font-weight: normal — сбрасываем жирность, которую браузер даёт h2 по умолчанию. */
 .search-form__fieldset-title {
   font-size: 18px;
   line-height: 100%;
   font-weight: normal;
 }
 
-.search-form__label {
-  /* элементы фэйлдсет */
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  gap: 5px;
-  cursor: pointer;
-}
+/* ============================================================
+   11. ТЕКСТОВОЕ ПОЛЕ
+   ============================================================ */
 
-.search-form__label:has(:focus-visible) {
-  outline: 1px solid #fff;
-  outline-offset: 1px;
-}
-
-.search-form__label:hover .search-form__label-text {
-  text-decoration: underline;
-}
-
+/* appearance: none — сбрасывает браузерное оформление инпута,
+   чтобы во всех браузерах поле выглядело одинаково.
+   border: none + только верхняя и нижняя рамки — по макету.
+   color: #fff — белый текст при вводе.
+   background-color: transparent — прозрачный фон (виден фон страницы). */
 .search-form__textfield {
-  /* Стилизация input[type="text"] */
   appearance: none;
   border: none;
   outline: none;
@@ -301,19 +422,58 @@ ol {
   width: 225px;
 }
 
+/* ::placeholder — стилизует серую подсказку внутри поля.
+   Цвет полупрозрачный белый */
 .search-form__textfield::placeholder {
   color: rgb(255 255 255 / 0.7);
 }
 
+/* ============================================================
+   12. ЛЕЙБЛЫ И ЧЕКБОКСЫ
+   ============================================================ */
+
+/* Лейбл — флекс-строка: чекбокс и текст рядом.
+   align-items: center — центрирует по вертикали.
+   width: fit-content — ширина по содержимому, не растягивается на всю строку.
+   gap: 5px — отступ между чекбоксом и текстом.
+   cursor: pointer — рука; клик по любому месту лейбла переключает чекбокс,
+   потому что input лежит внутри label. */
+.search-form__label {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 5px;
+  cursor: pointer;
+}
+
+/* :has() — селектор родителя по потомку. «Если внутри лейбла есть
+   элемент в состоянии :focus-visible — применить стили к лейблу».
+   Так обводка появляется у лейбла, а не у невидимого input.
+   :focus-visible (а не :focus) — чтобы обводка была только при
+   фокусе с клавиатуры, а не при клике мышью. */
+.search-form__label:has(:focus-visible) {
+  outline: 1px solid #fff;
+  outline-offset: 1px;
+}
+
+/* При наведении на лейбл подчёркиваем ТОЛЬКО текст (.search-form__label-text),
+   а не поле ввода. Поэтому селектор идёт через потомка. */
+.search-form__label:hover .search-form__label-text {
+  text-decoration: underline;
+}
+
+/* Контейнер чекбоксов — флекс-строка.
+   gap: 15px — отступ между чекбоксами. */
 .search-form__checkbox-list {
-  /* чекбоксы в линию */
   display: flex;
   gap: 15px;
   justify-content: center;
 }
 
+/* Кастомный (визуальный) чекбокс — квадрат 19×19 с белой рамкой.
+   Настоящий input скрыт (класс visually-hidden в HTML), а рисуется этот span.
+   position: relative — чтобы абсолютно позиционировать ::after внутри него. */
 .search-form__pseudo-checkbox {
-  /* Стилизация чекбокса */
   position: relative;
   width: 19px;
   height: 19px;
@@ -321,8 +481,12 @@ ol {
   display: inline-block;
 }
 
+/* ::after — псевдоэлемент, «виртуальный» элемент внутри чекбокса.
+   Без content: "" он не появится вообще — это обязательное условие.
+   Это внутренний белый квадрат, который закрашивает чекбокс при выборе.
+   position: absolute + top/left: 1px — отступ 1px от рамки.
+   display: none — по умолчанию скрыт (чекбокс не отмечен). */
 .search-form__pseudo-checkbox::after {
-  /* Внутренний квадрат — скрыт по умолчанию */
   content: "";
   position: absolute;
   top: 1px;
@@ -333,7 +497,14 @@ ol {
   display: none;
 }
 
+/* Цепочка селекторов:
+     .search-form__checkbox:checked — настоящий input в состоянии «отмечен»;
+     + — соседний элемент (тот, что идёт сразу после input в HTML,
+         то есть .search-form__pseudo-checkbox);
+     ::after — псевдоэлемент внутри этого соседа.
+   Когда чекбокс отмечен — внутренний квадрат показывается (display: block).
+   Так работает кастомный чекбокс: состояние хранит настоящий input,
+   а внешний вид рисует соседний span через ::after. */
 .search-form__checkbox:checked + .search-form__pseudo-checkbox::after {
-  /* Показываем квадрат, если чекбокс отмечен */
   display: block;
 }
